@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
+	<sub-flow name="sf-db-get-users" doc:id="2fedb00a-7694-4e45-b9b5-d72a622516b7" >
+		<os:retrieve-all doc:name="Retrieve all" doc:id="c1bbd1fb-b8ec-4198-8c49-668e10e5af47" objectStore="Object_store"/>
+	</sub-flow>
+	<sub-flow name="sf-db-create-users" doc:id="39170193-baf2-45d4-b5a9-a30dca77716e" >
+		<os:store doc:name="Store user " doc:id="374e9fd1-fe67-49f2-9cb7-8ddd8de040a2" key="#[vars.id]" objectStore="Object_store">
+			<os:value><![CDATA[#[vars.user]]]></os:value>
+		</os:store>
+		<os:retrieve doc:name="Retrieve" doc:id="6d92f806-5d5e-40dd-9a5f-d80399f7e249" key="#[vars.id]" objectStore="Object_store"/>
+		<logger level="INFO" doc:name="Logger" doc:id="830a0d23-41d2-44ac-b51c-69bd263f3f48" message="hi" />
+	</sub-flow>
+</mule>

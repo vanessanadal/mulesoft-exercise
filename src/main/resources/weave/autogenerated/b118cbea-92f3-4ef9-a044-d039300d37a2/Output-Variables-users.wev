@@ -1,0 +1,4 @@
+%dw 2.0
+
+type auto_b118cbea_92f3_4ef9_a044_d039300d37a2_Output_Variables_users = Array<Nothing>
+

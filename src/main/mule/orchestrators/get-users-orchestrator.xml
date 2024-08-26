@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
+	<sub-flow name="sf-get-users-orchestrator" doc:id="b118cbea-92f3-4ef9-a044-d039300d37a2" >
+		<flow-ref doc:name="Get users" doc:id="2a0225f4-f4c6-4a9f-a421-dc5292ea5b32" name="sf-db-get-users"/>
+		<ee:transform doc:name="Set payload and users" doc:id="56827d6f-d200-42da-b54a-5a737bc2e7b5" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="users" ><![CDATA[%dw 2.0
+output application/json
+---
+[]]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<foreach doc:name="For Each user" doc:id="478ea61a-5c9b-42f1-bec0-1fc79d9d9e0d" collection="#[payload]">
+			<ee:transform doc:name="Set id" doc:id="64e8af09-1ce3-4886-b965-725badca0800" >
+				<ee:message >
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="id" ><![CDATA[%dw 2.0
+output application/json
+---
+keysOf(payload)[0]]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<set-variable value="#[payload[vars.id]]" doc:name="Set user" doc:id="47c60b10-93fa-4946-8cc4-55e4ffb5c264" variableName="user"/>
+			<flow-ref doc:name="Get user additional data" doc:id="35ffe09c-7996-4188-a47d-d2e03afe3e98" name="sf-get-user-data"/>
+			<ee:transform doc:name="Set newUser" doc:id="5c985abf-67d3-46ec-b86d-e5fda04984b2" >
+				<ee:message >
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="newUser" ><![CDATA[%dw 2.0
+output application/json
+---
+vars.user ++ {address: payload.address, phone: payload.phone, website: payload.website, company: payload.company}]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<ee:transform doc:name="Add additional data to user" doc:id="f55ff2f6-5ae2-4802-954b-9673290b1fba" >
+				<ee:message >
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="users" ><![CDATA[%dw 2.0
+output application/json
+---
+vars.users ++ [vars.newUser]]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+		</foreach>
+		<set-payload value="#[vars.users]" doc:name="Set Payload" doc:id="6fe4698c-49fd-450f-b423-16631b4ed440" />
+	</sub-flow>
+</mule>

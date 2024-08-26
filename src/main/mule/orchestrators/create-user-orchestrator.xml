@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:os="http://www.mulesoft.org/schema/mule/os"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<sub-flow name="sf-create-user-orchestrator" doc:id="f79c2844-4777-4088-97f6-df928591303b" >
+		<flow-ref doc:name="Get users" doc:id="f9b651ea-5514-431a-85af-382c97020956" name="sf-db-get-users"/>
+		<set-variable value="#[%dw 2.0&#10;import * from dw::util::Coercions&#10;output application/json&#10;---&#10;toString(sizeOf(payload) + 1)]" doc:name="Set id" doc:id="1e35842c-bd8c-4720-ad96-d4a4840c8350" variableName="id"/>
+		<ee:transform doc:name="Set user object" doc:id="6f087326-b145-49d5-a899-3b36bd3f66d6" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="user" ><![CDATA[%dw 2.0
+output application/java
+---
+{'id':vars.id as String, 'name': vars.user.name as String, 'email': vars.user.email as String}]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="Create user" doc:id="0fb06901-026c-4032-97eb-d91c57e7c238" name="sf-db-create-users"/>
+	</sub-flow>
+</mule>
